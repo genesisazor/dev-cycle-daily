@@ -19,7 +19,7 @@
 
 **The bug:** Built food search on a live Open Food Facts API call first. Mid-build, discovered the legacy search endpoint was down site-wide — a real outage, not a local bug. Pivoted to a bundled local food list instead, which turned out to be more reliable for a daily-use tool anyway (no network dependency, can't go down).
 
-**What I learned:** Scope creeps hardest right after something starts working — each new feature (chain restaurant data, save-your-own-food memory, visual reskin) felt like a small add in the moment, but stacked up to a much bigger Day 1 than planned. Worth noticing when to keep saying yes vs. cut and ship. Also: don't build on an external API without a fallback plan, even for a "just search some data" feature — pivoted to a local dataset mid-build because the endpoint was down globally. (Used Open Food Facts API)
+**What I learned:** Scope creeps hardest right after something starts working. Each new feature (chain restaurant data, save-your-own-food memory, visual reskin) felt like a small add in the moment, but stacked up to a much bigger Day 1 than planned. Worth noticing when to keep saying yes vs. cut and ship. Also: don't build on an external API without a fallback plan, even for a "just search some data" feature. Pivoted to a local dataset mid-build because the endpoint was down globally. (Used Open Food Facts API)
 
 ---
 
