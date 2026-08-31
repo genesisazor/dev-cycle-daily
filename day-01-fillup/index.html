@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fillup — daily calorie & protein tank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@500;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F4E4C1;
+    --panel: #FFF8E7;
+    --wood: #5C3A21;
+    --wood-mid: #A9713F;
+    --leaf: #6FA85A;
+    --leaf-dark: #3F7A3D;
+    --berry: #D97052;
+    --berry-dark: #8E3324;
+    --sun: #E8A33D;
+    --ink: #3B2A1E;
+    --ink-soft: #7A5C3E;
+  }
+
+  * { box-sizing: border-box; image-rendering: pixelated; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(92,58,33,0.05) 0, rgba(92,58,33,0.05) 2px, transparent 2px, transparent 4px),
+      repeating-linear-gradient(90deg, rgba(92,58,33,0.05) 0, rgba(92,58,33,0.05) 2px, transparent 2px, transparent 4px);
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
+    font-size: 19px;
+    letter-spacing: 0.3px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 28px 16px 60px;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .kicker {
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'DynaPuff', cursive;
+    font-weight: 700;
+    font-size: 32px;
+    margin: 0 0 10px;
+    letter-spacing: 0.5px;
+    color: var(--wood);
+    text-shadow: 3px 3px 0 var(--sun);
+  }
+
+  .sub {
+    font-size: 18px;
+    color: var(--ink-soft);
+    margin-bottom: 24px;
+    line-height: 1.4;
+  }
+
+  /* --- Pixel panel base --- */
+  .tank-unit, .saved-box, .goals-box, .add-box, .selected-box, .result-item {
+    background: var(--panel);
+    border: 3px solid var(--wood);
+    border-radius: 0;
+    box-shadow: 4px 4px 0 0 var(--wood-mid);
+  }
+
+  /* --- Tanks --- */
+  .tanks {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 26px;
+  }
+
+  .tank-unit {
+    flex: 1;
+    padding: 16px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .tank-label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 17px;
+    letter-spacing: 0.5px;
+    color: var(--wood);
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  .tank {
+    position: relative;
+    width: 64px;
+    height: 150px;
+    border: 3px solid var(--wood);
+    border-radius: 0;
+    overflow: hidden;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent, transparent 13px,
+      rgba(92,58,33,0.10) 13px, rgba(92,58,33,0.10) 15px
+    );
+  }
+
+  .liquid {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0%;
+    transition: height 0.6s steps(10);
+  }
+  .liquid.empty svg { display: none; }
+  .liquid.cal { background: var(--leaf-dark); }
+  .liquid.pro { background: var(--berry-dark); }
+
+  .liquid svg {
+    position: absolute;
+    top: -7px;
+    left: 0;
+    width: 200%;
+    height: 8px;
+    animation: wave 1.6s steps(8) infinite;
+  }
+  @keyframes wave {
+    from { transform: translateX(0); }
+    to { transform: translateX(-40px); }
+  }
+  .liquid.cal svg path { fill: var(--leaf); }
+  .liquid.pro svg path { fill: var(--berry); }
+
+  .tank-readout {
+    margin-top: 12px;
+    text-align: center;
+  }
+  .tank-readout .num {
+    font-family: 'Nunito', sans-serif;
+    font-size: 28px;
+    color: var(--wood);
+    line-height: 1;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+  }
+  .tank-readout .of {
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    letter-spacing: 0.3px;
+    color: var(--ink-soft);
+  }
+  .tank-readout .pct {
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+
+  /* --- Saved foods --- */
+  .saved-box {
+    margin-bottom: 18px;
+    overflow: visible;
+  }
+  .saved-header {
+    width: 100%;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 19px;
+    letter-spacing: 0.4px;
+    font-weight: 700;
+    color: var(--wood);
+  }
+  .saved-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .bookmark-icon { color: var(--sun); flex: none; }
+  .saved-count {
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    color: var(--wood);
+    background: var(--bg);
+    border: 2px solid var(--wood);
+    border-radius: 0;
+    padding: 1px 8px;
+  }
+  .chevron {
+    color: var(--wood);
+    font-size: 12px;
+    transition: transform 0.15s;
+  }
+  .saved-box.open .chevron { transform: rotate(180deg); }
+  .saved-foods-list {
+    display: none;
+    padding: 0 16px 14px;
+  }
+  .saved-box.open .saved-foods-list { display: block; }
+
+  .goals-box {
+    padding: 16px;
+    margin-bottom: 22px;
+  }
+  .goals-box h2 {
+    font-family: 'Nunito', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.4px;
+    font-weight: 700;
+    color: var(--wood);
+    margin: 0 0 14px;
+  }
+  .field-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .field {
+    flex: 1;
+  }
+  .field label {
+    display: block;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+  input[type="number"], input[type="text"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 3px solid var(--wood);
+    border-radius: 0;
+    font-family: 'Nunito', sans-serif;
+    font-size: 18px;
+    background: #fff;
+    color: var(--ink);
+    box-shadow: inset 2px 2px 0 rgba(92,58,33,0.12);
+  }
+  input:focus {
+    outline: none;
+    border-color: var(--sun);
+  }
+  input[type="checkbox"] {
+    accent-color: var(--wood);
+    width: 16px;
+    height: 16px;
+  }
+
+  button {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.2px;
+    border: 3px solid var(--wood);
+    border-radius: 0;
+    padding: 10px 14px;
+    cursor: pointer;
+    background: var(--panel);
+    color: var(--wood);
+  }
+  .btn-primary {
+    background: var(--leaf-dark);
+    color: #fff;
+    border-color: var(--wood);
+    width: 100%;
+    font-size: 19px;
+    box-shadow: 4px 4px 0 0 var(--wood);
+    transition: transform 0.05s, box-shadow 0.05s;
+  }
+  .btn-primary:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0 0 0 0 var(--wood);
+  }
+
+  /* --- Add food --- */
+  .add-box {
+    padding: 16px;
+    margin-bottom: 22px;
+  }
+  .add-box h2 {
+    font-family: 'Nunito', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.4px;
+    font-weight: 700;
+    color: var(--wood);
+    margin: 0 0 14px;
+  }
+
+  /* --- Log --- */
+  .log {
+    background-color: var(--panel);
+    border: 3px solid var(--wood);
+    border-radius: 0;
+    box-shadow: 4px 4px 0 0 var(--wood-mid);
+    padding: 16px;
+    margin-bottom: 22px;
+  }
+  .log h2 {
+    font-family: 'Nunito', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.4px;
+    font-weight: 700;
+    color: var(--wood);
+    margin: 0 0 8px;
+  }
+  .log .empty {
+    font-size: 16px;
+    color: var(--ink-soft);
+    padding: 18px 0;
+    text-align: center;
+  }
+  .entry {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 2px;
+    border-bottom: 3px dashed var(--wood-mid);
+    gap: 10px;
+  }
+  .entry:last-child { border-bottom: none; }
+  .entry-name {
+    font-size: 17px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .entry-macros {
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .entry-bookmark {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    padding: 2px 4px;
+    line-height: 1;
+    flex: none;
+  }
+  .entry-bookmark.saved { color: var(--sun); }
+  .entry-del {
+    background: none;
+    border: none;
+    color: var(--berry-dark);
+    font-size: 20px;
+    padding: 2px 6px;
+    line-height: 1;
+  }
+
+  .remember-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .remember-row input {
+    width: auto;
+    margin-top: 3px;
+  }
+  .remember-row label {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+
+  .tab-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .tab-btn {
+    flex: 1;
+    background: var(--bg);
+    color: var(--wood);
+    border: 3px solid var(--wood);
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+  .tab-btn.active {
+    background: var(--wood);
+    color: #fff;
+  }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .search-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .search-row input { flex: 1; }
+  .btn-secondary {
+    background: var(--sun);
+    color: var(--wood);
+    border-color: var(--wood);
+    white-space: nowrap;
+    box-shadow: 3px 3px 0 0 var(--wood);
+    transition: transform 0.05s, box-shadow 0.05s;
+  }
+  .btn-secondary:active {
+    transform: translate(3px, 3px);
+    box-shadow: 0 0 0 0 var(--wood);
+  }
+
+  .search-status {
+    font-size: 15px;
+    color: var(--ink-soft);
+    padding: 6px 0;
+  }
+
+  .result-item {
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    box-shadow: 3px 3px 0 0 var(--wood-mid);
+    transition: transform 0.05s, box-shadow 0.05s;
+  }
+  .result-item:active {
+    transform: translate(3px, 3px);
+    box-shadow: 0 0 0 0 var(--wood-mid);
+  }
+  .result-name {
+    font-size: 17px;
+    margin-bottom: 3px;
+    color: var(--ink);
+  }
+  .result-macros {
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+
+  .selected-box {
+    padding: 12px;
+    margin-top: 6px;
+    border-color: var(--sun);
+  }
+  .selected-name {
+    font-size: 17px;
+    font-weight: 400;
+    margin-bottom: 8px;
+    color: var(--wood);
+  }
+  .qty-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .qty-row input { width: 90px; flex: none; }
+  .qty-row span { font-size: 14px; color: var(--ink-soft); }
+  .selected-preview {
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+
+  .source-note {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+
+  .saved-foods-empty {
+    font-size: 14px;
+    color: var(--ink-soft);
+    padding: 6px 0;
+  }
+  .saved-food-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 3px dashed var(--wood-mid);
+  }
+  .saved-food-row:last-child { border-bottom: none; }
+  .saved-food-name {
+    font-size: 16px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--ink);
+  }
+  .saved-food-macros {
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .saved-food-del {
+    background: none;
+    border: none;
+    color: var(--berry-dark);
+    font-size: 18px;
+    padding: 2px 6px;
+    line-height: 1;
+  }
+
+  .footer-row {
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .reset-link {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    font-size: 15px;
+    padding: 0;
+    text-decoration: underline;
+  }
+  .day-tag {
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    color: var(--ink-soft);
+  }
+</style>
+
+</head>
+<body>
+<div class="app">
+  <div class="kicker">dev-cycle-daily &middot; day 01 &middot; vanilla html/css/js</div>
+  <h1>Fillup</h1>
+  <div class="sub">Set a goal. Log what you eat. Watch the tank rise.</div>
+
+  <div class="tanks">
+    <div class="tank-unit">
+      <div class="tank-label">Calories</div>
+      <div class="tank">
+        <div class="liquid cal empty" id="calLiquid">
+          <svg viewBox="0 0 40 8" preserveAspectRatio="none"><path d="M0,8 L0,4 L5,4 L5,0 L10,0 L10,4 L15,4 L15,0 L20,0 L20,4 L25,4 L25,0 L30,0 L30,4 L35,4 L35,0 L40,0 L40,8 Z"/></svg>
+        </div>
+      </div>
+      <div class="tank-readout">
+        <div class="num" id="calNum">0</div>
+        <div class="of" id="calOf">of 0</div>
+        <div class="pct" id="calPct">set a goal below</div>
+      </div>
+    </div>
+
+    <div class="tank-unit">
+      <div class="tank-label">Protein</div>
+      <div class="tank">
+        <div class="liquid pro empty" id="proLiquid">
+          <svg viewBox="0 0 40 8" preserveAspectRatio="none"><path d="M0,8 L0,4 L5,4 L5,0 L10,0 L10,4 L15,4 L15,0 L20,0 L20,4 L25,4 L25,0 L30,0 L30,4 L35,4 L35,0 L40,0 L40,8 Z"/></svg>
+        </div>
+      </div>
+      <div class="tank-readout">
+        <div class="num" id="proNum">0g</div>
+        <div class="of" id="proOf">of 0g</div>
+        <div class="pct" id="proPct">set a goal below</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="saved-box" id="savedBox">
+    <button class="saved-header" id="toggleSavedFoodsBtn">
+      <span class="saved-header-left">
+        <svg class="bookmark-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+        <span>My saved foods</span>
+        <span class="saved-count" id="savedCount">0</span>
+      </span>
+      <span class="chevron" id="savedChevron">&#9662;</span>
+    </button>
+    <div class="saved-foods-list" id="savedFoodsList"></div>
+  </div>
+
+  <div class="goals-box">
+    <h2>Today's goal</h2>
+    <div class="field-row">
+      <div class="field">
+        <label for="calGoalInput">Calories</label>
+        <input type="number" id="calGoalInput" placeholder="2200" min="0">
+      </div>
+      <div class="field">
+        <label for="proGoalInput">Protein (g)</label>
+        <input type="number" id="proGoalInput" placeholder="150" min="0">
+      </div>
+    </div>
+    <button class="btn-primary" id="saveGoalsBtn">Save goal</button>
+  </div>
+
+  <div class="add-box">
+    <h2>Log food</h2>
+    <div class="tab-row">
+      <button class="tab-btn active" id="tabSearchBtn">Search food</button>
+      <button class="tab-btn" id="tabManualBtn">Enter manually</button>
+    </div>
+
+    <div class="panel active" id="searchPanel">
+      <div class="search-row">
+        <input type="text" id="searchInput" placeholder="e.g. chicken, rice, banana">
+        <button class="btn-secondary" id="searchBtn">Search</button>
+      </div>
+      <div id="searchStatus"></div>
+      <div id="searchResults"></div>
+      <div id="selectedFoodBox"></div>
+      <div class="source-note">Built-in list: common staples (by weight) plus sized drinks and popular NYC chain items. Chain values are approximate, published estimates &mdash; check the official source if precision matters. Anything you bookmark shows up here too, tagged "saved by you."</div>
+    </div>
+
+    <div class="panel" id="manualPanel">
+      <div class="field-row">
+        <div class="field" style="flex: 2;">
+          <label for="foodName">What did you eat</label>
+          <input type="text" id="foodName" placeholder="Grilled chicken">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="foodCal">Calories</label>
+          <input type="number" id="foodCal" placeholder="280" min="0">
+        </div>
+        <div class="field">
+          <label for="foodPro">Protein (g)</label>
+          <input type="number" id="foodPro" placeholder="35" min="0">
+        </div>
+      </div>
+      <div class="remember-row">
+        <input type="checkbox" id="rememberFood" checked>
+        <label for="rememberFood">Remember this food, so I can find it by searching next time</label>
+      </div>
+      <button class="btn-primary" id="addFoodBtn">Add to today</button>
+    </div>
+  </div>
+
+  <div class="log">
+    <h2>Today's log</h2>
+    <div id="logList"></div>
+  </div>
+
+  <div class="footer-row">
+    <span class="day-tag" id="dayTag"></span>
+    <button class="reset-link" id="resetBtn">Reset today</button>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'fillup_state_v1';
+
+  function todayStr() {
+    const d = new Date();
+    return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+  }
+
+  function loadState() {
+    let raw;
+    try { raw = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e) { raw = null; }
+    if (!raw) raw = { calGoal: null, proGoal: null, date: todayStr(), entries: [] };
+    if (raw.date !== todayStr()) {
+      raw.date = todayStr();
+      raw.entries = [];
+    }
+    return raw;
+  }
+
+  let state = loadState();
+
+  function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function render() {
+    document.getElementById('dayTag').textContent = state.date;
+
+    // Goal inputs reflect saved goals
+    document.getElementById('calGoalInput').value = state.calGoal ?? '';
+    document.getElementById('proGoalInput').value = state.proGoal ?? '';
+
+    const calTotal = state.entries.reduce((s,e) => s + e.cal, 0);
+    const proTotal = state.entries.reduce((s,e) => s + e.pro, 0);
+
+    // Calories tank
+    document.getElementById('calNum').textContent = calTotal;
+    const calLiquidEl = document.getElementById('calLiquid');
+    if (state.calGoal) {
+      document.getElementById('calOf').textContent = 'of ' + state.calGoal;
+      const pct = Math.min(100, Math.round((calTotal/state.calGoal)*100));
+      document.getElementById('calPct').textContent = pct + '%';
+      calLiquidEl.style.height = pct + '%';
+      calLiquidEl.classList.toggle('empty', pct === 0);
+    } else {
+      document.getElementById('calOf').textContent = 'of 0';
+      document.getElementById('calPct').textContent = 'set a goal below';
+      calLiquidEl.style.height = '0%';
+      calLiquidEl.classList.add('empty');
+    }
+
+    // Protein tank
+    document.getElementById('proNum').textContent = proTotal + 'g';
+    const proLiquidEl = document.getElementById('proLiquid');
+    if (state.proGoal) {
+      document.getElementById('proOf').textContent = 'of ' + state.proGoal + 'g';
+      const pct = Math.min(100, Math.round((proTotal/state.proGoal)*100));
+      document.getElementById('proPct').textContent = pct + '%';
+      proLiquidEl.style.height = pct + '%';
+      proLiquidEl.classList.toggle('empty', pct === 0);
+    } else {
+      document.getElementById('proOf').textContent = 'of 0g';
+      document.getElementById('proPct').textContent = 'set a goal below';
+      proLiquidEl.style.height = '0%';
+      proLiquidEl.classList.add('empty');
+    }
+
+    // Log list
+    const list = document.getElementById('logList');
+    list.innerHTML = '';
+    if (state.entries.length === 0) {
+      list.innerHTML = '<div class="empty">Nothing logged yet today.</div>';
+    } else {
+      state.entries.slice().reverse().forEach(entry => {
+        const row = document.createElement('div');
+        row.className = 'entry';
+        const isSaved = loadCustomFoods().some(f => f.name.toLowerCase() === entry.name.toLowerCase());
+        row.innerHTML = `
+          <div class="entry-name">${escapeHtml(entry.name)}</div>
+          <div class="entry-macros">${entry.cal} cal &middot; ${entry.pro}g</div>
+          <button class="entry-bookmark ${isSaved ? 'saved' : ''}" data-name="${escapeHtml(entry.name)}" data-cal="${entry.cal}" data-pro="${entry.pro}" title="${isSaved ? 'Saved to My saved foods' : 'Save to My saved foods'}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="${isSaved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+          </button>
+          <button class="entry-del" data-id="${entry.id}">&times;</button>
+        `;
+        list.appendChild(row);
+      });
+    }
+  }
+
+  function escapeHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  document.getElementById('saveGoalsBtn').addEventListener('click', () => {
+    const cal = parseFloat(document.getElementById('calGoalInput').value);
+    const pro = parseFloat(document.getElementById('proGoalInput').value);
+    state.calGoal = isNaN(cal) ? null : cal;
+    state.proGoal = isNaN(pro) ? null : pro;
+    saveState();
+    render();
+  });
+
+  function addEntry(name, cal, pro) {
+    state.entries.push({
+      id: Date.now(),
+      name: name,
+      cal: isNaN(cal) ? 0 : Math.round(cal),
+      pro: isNaN(pro) ? 0 : Math.round(pro)
+    });
+    saveState();
+    render();
+  }
+
+  // --- Tab switching ---
+  const tabSearchBtn = document.getElementById('tabSearchBtn');
+  const tabManualBtn = document.getElementById('tabManualBtn');
+  const searchPanel = document.getElementById('searchPanel');
+  const manualPanel = document.getElementById('manualPanel');
+
+  function showSearchTab() {
+    tabSearchBtn.classList.add('active');
+    tabManualBtn.classList.remove('active');
+    searchPanel.classList.add('active');
+    manualPanel.classList.remove('active');
+  }
+  function showManualTab() {
+    tabManualBtn.classList.add('active');
+    tabSearchBtn.classList.remove('active');
+    manualPanel.classList.add('active');
+    searchPanel.classList.remove('active');
+  }
+  tabSearchBtn.addEventListener('click', showSearchTab);
+  tabManualBtn.addEventListener('click', showManualTab);
+
+  // --- Manual entry ---
+  document.getElementById('addFoodBtn').addEventListener('click', () => {
+    const nameInput = document.getElementById('foodName');
+    const calInput = document.getElementById('foodCal');
+    const proInput = document.getElementById('foodPro');
+    const rememberBox = document.getElementById('rememberFood');
+
+    const name = nameInput.value.trim() || 'Untitled item';
+    const cal = parseFloat(calInput.value);
+    const pro = parseFloat(proInput.value);
+
+    if (isNaN(cal) && isNaN(pro)) {
+      calInput.focus();
+      return;
+    }
+
+    const finalCal = isNaN(cal) ? 0 : cal;
+    const finalPro = isNaN(pro) ? 0 : pro;
+
+    addEntry(name, finalCal, finalPro);
+
+    if (rememberBox.checked && nameInput.value.trim()) {
+      saveCustomFood(name, finalCal, finalPro);
+    }
+
+    nameInput.value = '';
+    calInput.value = '';
+    proInput.value = '';
+    nameInput.focus();
+  });
+
+  // --- Food search (Open Food Facts) ---
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+  const searchStatus = document.getElementById('searchStatus');
+  const searchResults = document.getElementById('searchResults');
+  const selectedFoodBox = document.getElementById('selectedFoodBox');
+
+  let selectedFood = null; // { name, kcalPer100, proPer100 }
+
+  // --- Food database — no network call, always available ---
+  // 'weight' items: enter grams eaten, scaled from per-100g values.
+  // 'serving' items: fixed-size items (drink sizes, chain menu items) — enter how many.
+  const FOOD_DB = [
+    // Generic staples (weight-based, per 100g)
+    { type: 'weight', name: 'Chicken breast, cooked', kcal100: 165, pro100: 31 },
+    { type: 'weight', name: 'Chicken thigh, cooked', kcal100: 209, pro100: 26 },
+    { type: 'weight', name: 'Ground beef 80/20, cooked', kcal100: 254, pro100: 25 },
+    { type: 'weight', name: 'Ground beef 90/10, cooked', kcal100: 176, pro100: 26 },
+    { type: 'weight', name: 'Salmon, cooked', kcal100: 206, pro100: 22 },
+    { type: 'weight', name: 'Tuna, canned in water', kcal100: 116, pro100: 26 },
+    { type: 'weight', name: 'Shrimp, cooked', kcal100: 99, pro100: 24 },
+    { type: 'weight', name: 'Turkey breast, cooked', kcal100: 135, pro100: 30 },
+    { type: 'weight', name: 'Pork chop, cooked', kcal100: 231, pro100: 27 },
+    { type: 'weight', name: 'Bacon, cooked', kcal100: 541, pro100: 37 },
+    { type: 'weight', name: 'Egg, whole', kcal100: 155, pro100: 13 },
+    { type: 'weight', name: 'Egg white', kcal100: 52, pro100: 11 },
+    { type: 'weight', name: 'Tofu, firm', kcal100: 144, pro100: 15 },
+    { type: 'weight', name: 'Greek yogurt, plain nonfat', kcal100: 59, pro100: 10 },
+    { type: 'weight', name: 'Cottage cheese, low fat', kcal100: 72, pro100: 12 },
+    { type: 'weight', name: 'Whey protein powder', kcal100: 400, pro100: 80 },
+    { type: 'weight', name: 'White rice, cooked', kcal100: 130, pro100: 2.7 },
+    { type: 'weight', name: 'Brown rice, cooked', kcal100: 123, pro100: 2.6 },
+    { type: 'weight', name: 'Quinoa, cooked', kcal100: 120, pro100: 4.4 },
+    { type: 'weight', name: 'Oats, dry', kcal100: 389, pro100: 17 },
+    { type: 'weight', name: 'Whole wheat bread', kcal100: 247, pro100: 13 },
+    { type: 'weight', name: 'White bread', kcal100: 265, pro100: 9 },
+    { type: 'weight', name: 'Pasta, cooked', kcal100: 131, pro100: 5 },
+    { type: 'weight', name: 'Sweet potato, baked', kcal100: 90, pro100: 2 },
+    { type: 'weight', name: 'Potato, baked', kcal100: 93, pro100: 2.5 },
+    { type: 'weight', name: 'Tortilla, flour', kcal100: 310, pro100: 8 },
+    { type: 'weight', name: 'Banana', kcal100: 89, pro100: 1.1 },
+    { type: 'weight', name: 'Apple', kcal100: 52, pro100: 0.3 },
+    { type: 'weight', name: 'Broccoli, cooked', kcal100: 35, pro100: 2.4 },
+    { type: 'weight', name: 'Spinach, raw', kcal100: 23, pro100: 2.9 },
+    { type: 'weight', name: 'Avocado', kcal100: 160, pro100: 2 },
+    { type: 'weight', name: 'Mixed berries', kcal100: 57, pro100: 0.7 },
+    { type: 'weight', name: 'Carrots, raw', kcal100: 41, pro100: 0.9 },
+    { type: 'weight', name: 'Tomato', kcal100: 18, pro100: 0.9 },
+    { type: 'weight', name: 'Milk, whole', kcal100: 61, pro100: 3.2 },
+    { type: 'weight', name: 'Milk, skim', kcal100: 34, pro100: 3.4 },
+    { type: 'weight', name: 'Cheddar cheese', kcal100: 403, pro100: 25 },
+    { type: 'weight', name: 'Mozzarella cheese', kcal100: 280, pro100: 28 },
+    { type: 'weight', name: 'Peanut butter', kcal100: 588, pro100: 25 },
+    { type: 'weight', name: 'Almonds', kcal100: 579, pro100: 21 },
+    { type: 'weight', name: 'Olive oil', kcal100: 884, pro100: 0 },
+    { type: 'weight', name: 'Butter', kcal100: 717, pro100: 0.9 },
+    { type: 'weight', name: 'Black beans, cooked', kcal100: 132, pro100: 8.9 },
+    { type: 'weight', name: 'Chickpeas, cooked', kcal100: 164, pro100: 8.9 },
+    { type: 'weight', name: 'Lentils, cooked', kcal100: 116, pro100: 9 },
+    { type: 'weight', name: 'French fries', kcal100: 312, pro100: 3.4 },
+
+    // Generic sized items (serving-based, with size options)
+    { type: 'serving', name: 'Milkshake, chocolate \u2014 Small (12oz)', servingLabel: '1 small (12 oz)', kcal: 470, pro: 9 },
+    { type: 'serving', name: 'Milkshake, chocolate \u2014 Medium (16oz)', servingLabel: '1 medium (16 oz)', kcal: 660, pro: 12 },
+    { type: 'serving', name: 'Milkshake, chocolate \u2014 Large (20oz)', servingLabel: '1 large (20 oz)', kcal: 850, pro: 15 },
+    { type: 'serving', name: 'Milkshake, vanilla \u2014 Small (12oz)', servingLabel: '1 small (12 oz)', kcal: 430, pro: 9 },
+    { type: 'serving', name: 'Milkshake, vanilla \u2014 Medium (16oz)', servingLabel: '1 medium (16 oz)', kcal: 610, pro: 12 },
+    { type: 'serving', name: 'Milkshake, vanilla \u2014 Large (20oz)', servingLabel: '1 large (20 oz)', kcal: 790, pro: 15 },
+    { type: 'serving', name: 'Pizza, cheese \u2014 1 NY slice', servingLabel: '1 slice', kcal: 285, pro: 12 },
+    { type: 'serving', name: 'Bagel with cream cheese', servingLabel: '1 bagel', kcal: 480, pro: 15 },
+    { type: 'serving', name: 'Hamburger, fast food \u2014 1 sandwich', servingLabel: '1 sandwich', kcal: 550, pro: 25 },
+    { type: 'serving', name: 'Protein bar \u2014 1 bar', servingLabel: '1 bar', kcal: 350, pro: 20 },
+    { type: 'serving', name: 'Coffee, black \u2014 medium', servingLabel: '1 medium (16 oz)', kcal: 5, pro: 0.3 },
+    { type: 'serving', name: 'Iced coffee with milk & sugar \u2014 medium', servingLabel: '1 medium (16 oz)', kcal: 120, pro: 2 },
+
+    // NYC-common chain items (approximate, from published nutrition info)
+    { type: 'serving', name: "Shake Shack \u2014 ShackBurger", servingLabel: '1 burger', kcal: 550, pro: 30 },
+    { type: 'serving', name: 'Shake Shack \u2014 Chocolate Shake', servingLabel: '1 shake', kcal: 670, pro: 13 },
+    { type: 'serving', name: 'Shake Shack \u2014 Vanilla Shake', servingLabel: '1 shake', kcal: 680, pro: 12 },
+    { type: 'serving', name: 'Shake Shack \u2014 Crinkle Fries, regular', servingLabel: '1 regular', kcal: 420, pro: 5 },
+    { type: 'serving', name: "McDonald's \u2014 Big Mac", servingLabel: '1 sandwich', kcal: 550, pro: 25 },
+    { type: 'serving', name: "McDonald's \u2014 Medium Fries", servingLabel: '1 medium', kcal: 320, pro: 4 },
+    { type: 'serving', name: "McDonald's \u2014 Chocolate Shake, Small", servingLabel: '1 small', kcal: 470, pro: 11 },
+    { type: 'serving', name: "McDonald's \u2014 Chocolate Shake, Medium", servingLabel: '1 medium', kcal: 580, pro: 13 },
+    { type: 'serving', name: "McDonald's \u2014 Chocolate Shake, Large", servingLabel: '1 large', kcal: 850, pro: 19 },
+    { type: 'serving', name: 'Starbucks \u2014 Caffe Latte, Grande, 2% milk', servingLabel: '1 grande (16 oz)', kcal: 190, pro: 12 },
+    { type: 'serving', name: 'Starbucks \u2014 Vanilla Frappuccino, Grande', servingLabel: '1 grande (16 oz)', kcal: 370, pro: 4 },
+    { type: 'serving', name: "Dunkin' \u2014 Glazed Donut", servingLabel: '1 donut', kcal: 260, pro: 3 },
+    { type: 'serving', name: "Dunkin' \u2014 Iced Coffee w/ cream & sugar, medium", servingLabel: '1 medium', kcal: 120, pro: 1 },
+    { type: 'serving', name: 'Chipotle \u2014 Chicken Burrito Bowl', servingLabel: '1 bowl', kcal: 625, pro: 40 },
+    { type: 'serving', name: 'Five Guys \u2014 Little Cheeseburger', servingLabel: '1 burger', kcal: 560, pro: 29 },
+    { type: 'serving', name: 'Sweetgreen \u2014 Harvest Bowl', servingLabel: '1 bowl', kcal: 685, pro: 27 },
+    { type: 'serving', name: 'The Halal Guys \u2014 Chicken over Rice, regular', servingLabel: '1 regular platter', kcal: 750, pro: 45 },
+    { type: 'serving', name: "Wendy's \u2014 Dave's Single", servingLabel: '1 burger', kcal: 570, pro: 30 },
+    { type: 'serving', name: "Wendy's \u2014 Medium Fries", servingLabel: '1 medium', kcal: 420, pro: 5 },
+    { type: 'serving', name: 'Burger King \u2014 Whopper', servingLabel: '1 sandwich', kcal: 660, pro: 28 },
+    { type: 'serving', name: "Subway \u2014 6\u2033 Turkey Breast on wheat", servingLabel: '1 six-inch', kcal: 280, pro: 18 },
+    { type: 'serving', name: 'Chick-fil-A \u2014 Chicken Sandwich', servingLabel: '1 sandwich', kcal: 440, pro: 28 },
+    { type: 'serving', name: 'Chick-fil-A \u2014 Waffle Fries, medium', servingLabel: '1 medium', kcal: 420, pro: 5 },
+    { type: 'serving', name: "Popeyes \u2014 Chicken Sandwich", servingLabel: '1 sandwich', kcal: 690, pro: 27 },
+    { type: 'serving', name: "Domino's \u2014 Cheese Pizza, 1 slice (medium)", servingLabel: '1 slice', kcal: 200, pro: 8 },
+    { type: 'serving', name: 'Taco Bell \u2014 Crunchy Taco', servingLabel: '1 taco', kcal: 170, pro: 8 },
+    { type: 'serving', name: 'KFC \u2014 Original Recipe Chicken Breast', servingLabel: '1 piece', kcal: 390, pro: 39 },
+    { type: 'serving', name: 'Panera \u2014 Broccoli Cheddar Soup, bowl', servingLabel: '1 bowl', kcal: 360, pro: 12 },
+    { type: 'serving', name: 'Panda Express \u2014 Orange Chicken', servingLabel: '1 entree serving', kcal: 490, pro: 25 },
+    { type: 'serving', name: "Jersey Mike's \u2014 Turkey and Provolone, regular", servingLabel: '1 regular sub', kcal: 480, pro: 30 }
+  ];
+
+  function searchFoodDb(query) {
+    const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
+    const all = FOOD_DB.concat(loadCustomFoods());
+    return all.filter(f => {
+      const name = f.name.toLowerCase();
+      return tokens.every(t => name.includes(t));
+    });
+  }
+
+  const CUSTOM_FOODS_KEY = 'fillup_custom_foods_v1';
+
+  function loadCustomFoods() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(CUSTOM_FOODS_KEY));
+      return Array.isArray(raw) ? raw : [];
+    } catch (e) { return []; }
+  }
+
+  function saveCustomFood(name, kcal, pro) {
+    const list = loadCustomFoods();
+    // avoid exact duplicate names
+    if (list.some(f => f.name.toLowerCase() === name.toLowerCase())) return;
+    list.push({ type: 'serving', name: name, servingLabel: '1 serving (as you entered it)', kcal: kcal, pro: pro, custom: true });
+    localStorage.setItem(CUSTOM_FOODS_KEY, JSON.stringify(list));
+    renderSavedFoods();
+  }
+
+  function deleteCustomFood(name) {
+    const list = loadCustomFoods().filter(f => f.name !== name);
+    localStorage.setItem(CUSTOM_FOODS_KEY, JSON.stringify(list));
+    renderSavedFoods();
+  }
+
+  function renderSavedFoods() {
+    const list = loadCustomFoods();
+    const listEl = document.getElementById('savedFoodsList');
+    document.getElementById('savedCount').textContent = list.length;
+
+    if (list.length === 0) {
+      listEl.innerHTML = '<div class="saved-foods-empty">Nothing saved yet. Bookmark an item from today\'s log, or check "remember this food" when adding manually.</div>';
+      return;
+    }
+
+    listEl.innerHTML = '';
+    list.forEach(f => {
+      const row = document.createElement('div');
+      row.className = 'saved-food-row';
+      row.innerHTML = `
+        <div class="saved-food-name">${escapeHtml(f.name)}</div>
+        <div class="saved-food-macros">${f.kcal} cal &middot; ${f.pro}g</div>
+        <button class="saved-food-del" data-name="${escapeHtml(f.name)}">&times;</button>
+      `;
+      listEl.appendChild(row);
+    });
+  }
+
+  function runSearch() {
+    const query = searchInput.value.trim();
+    if (!query) { searchInput.focus(); return; }
+
+    selectedFood = null;
+    selectedFoodBox.innerHTML = '';
+    searchResults.innerHTML = '';
+
+    const matches = searchFoodDb(query);
+
+    if (matches.length === 0) {
+      searchStatus.textContent = "No matches in the starter list \u2014 try a simpler term, or enter it manually.";
+      return;
+    }
+
+    searchStatus.textContent = 'Tap a result to use it:';
+    matches.slice(0, 10).forEach(f => {
+      const macroText = f.type === 'weight'
+        ? `${f.kcal100} cal \u00b7 ${f.pro100}g protein \u00b7 per 100g`
+        : `${f.kcal} cal \u00b7 ${f.pro}g protein \u00b7 ${f.servingLabel}`;
+      const tag = f.custom ? ' \u00b7 saved by you' : '';
+      const btn = document.createElement('button');
+      btn.className = 'result-item';
+      btn.innerHTML = `
+        <div class="result-name">${escapeHtml(f.name)}</div>
+        <div class="result-macros">${macroText}${tag}</div>
+      `;
+      btn.addEventListener('click', () => selectFood(f));
+      searchResults.appendChild(btn);
+    });
+  }
+
+  function selectFood(food) {
+    selectedFood = food;
+    searchResults.innerHTML = '';
+    searchStatus.textContent = '';
+    renderSelectedFood();
+  }
+
+  function renderSelectedFood() {
+    if (!selectedFood) { selectedFoodBox.innerHTML = ''; return; }
+
+    const isWeight = selectedFood.type === 'weight';
+    const qtyLabel = isWeight ? 'grams eaten' : ('how many \u2014 ' + selectedFood.servingLabel);
+    const qtyDefault = isWeight ? 100 : 1;
+    const qtyStep = isWeight ? 1 : 0.5;
+
+    selectedFoodBox.innerHTML = `
+      <div class="selected-box">
+        <div class="selected-name">${escapeHtml(selectedFood.name)}</div>
+        <div class="qty-row">
+          <input type="number" id="qtyInput" value="${qtyDefault}" min="0" step="${qtyStep}">
+          <span>${qtyLabel}</span>
+        </div>
+        <div class="selected-preview" id="qtyPreview"></div>
+        <button class="btn-primary" id="addSelectedBtn">Add to today</button>
+      </div>
+    `;
+    const qtyInput = document.getElementById('qtyInput');
+    const preview = document.getElementById('qtyPreview');
+
+    function computeTotals() {
+      const qty = parseFloat(qtyInput.value) || 0;
+      if (isWeight) {
+        return {
+          cal: (selectedFood.kcal100 / 100) * qty,
+          pro: (selectedFood.pro100 / 100) * qty
+        };
+      } else {
+        return {
+          cal: selectedFood.kcal * qty,
+          pro: selectedFood.pro * qty
+        };
+      }
+    }
+
+    function updatePreview() {
+      const t = computeTotals();
+      preview.textContent = '\u2248 ' + Math.round(t.cal) + ' cal \u00b7 ' + Math.round(t.pro) + 'g protein';
+    }
+    updatePreview();
+    qtyInput.addEventListener('input', updatePreview);
+
+    document.getElementById('addSelectedBtn').addEventListener('click', () => {
+      const t = computeTotals();
+      addEntry(selectedFood.name, t.cal, t.pro);
+      selectedFood = null;
+      selectedFoodBox.innerHTML = '';
+      searchInput.value = '';
+      searchStatus.textContent = '';
+    });
+  }
+
+  searchBtn.addEventListener('click', runSearch);
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') runSearch();
+  });
+
+  document.getElementById('logList').addEventListener('click', (e) => {
+    const delBtn = e.target.closest('.entry-del');
+    if (delBtn) {
+      const id = Number(delBtn.dataset.id);
+      state.entries = state.entries.filter(en => en.id !== id);
+      saveState();
+      render();
+      return;
+    }
+    const bookmarkBtn = e.target.closest('.entry-bookmark');
+    if (bookmarkBtn) {
+      saveCustomFood(bookmarkBtn.dataset.name, Number(bookmarkBtn.dataset.cal), Number(bookmarkBtn.dataset.pro));
+      render();
+    }
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (confirm('Clear everything logged today? Your goal stays saved.')) {
+      state.entries = [];
+      saveState();
+      render();
+    }
+  });
+
+  // --- Saved foods management ---
+  const savedBox = document.getElementById('savedBox');
+  const savedFoodsList = document.getElementById('savedFoodsList');
+
+  document.getElementById('toggleSavedFoodsBtn').addEventListener('click', () => {
+    savedBox.classList.toggle('open');
+  });
+
+  savedFoodsList.addEventListener('click', (e) => {
+    const delBtn = e.target.closest('.saved-food-del');
+    if (delBtn) {
+      deleteCustomFood(delBtn.dataset.name);
+      render();
+    }
+  });
+
+  renderSavedFoods();
+  render();
+</script>
+</body>
+</html>
