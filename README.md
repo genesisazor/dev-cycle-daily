@@ -2,12 +2,10 @@
 
 | Day | App | Stack Type | Live Link | Notes |
 |-----|-----|-----------|-----------|-------|
+| 002 | Artist Quote Jar | CRUD, vanilla HTML/CSS/JS | [https://soft-gnome-c3f187.netlify.app] | quote generator, custom pixel-art jar + library background |
 | 001 | Fillup | CRUD (touched API integration too) | [ https://stupendous-axolotl-5b0503.netlify.app/ ] | food/calorie tracker, scope grew a lot |
 
 *(newest entries added to top of table as the log grows)*
-
-|-----|-----|-----------|-----------|-------|
-| 002 | Artist Quote Jar | CRUD, vanilla HTML/CSS/JS | [https://soft-gnome-c3f187.netlify.app] | quote generator, custom pixel-art jar + library background |
 
 ---
 
