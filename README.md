@@ -7,6 +7,9 @@
 *(newest entries added to top of table as the log grows)*
 
 ---
+| 002 | Artist Quote Jar | CRUD, vanilla HTML/CSS/JS | [ADD-YOUR-NETLIFY-LINK-HERE] | quote generator, custom pixel-art jar + library background |
+
+---
 
 ## Entries
 
