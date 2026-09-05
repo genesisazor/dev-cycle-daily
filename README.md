@@ -22,6 +22,17 @@
 **What I learned:** Scope creeps hardest right after something starts working. Each new feature (chain restaurant data, save-your-own-food memory, visual reskin) felt like a small add in the moment, but stacked up to a much bigger Day 1 than planned. Worth noticing when to keep saying yes vs. cut and ship. Also: don't build on an external API without a fallback plan, even for a "just search some data" feature. Pivoted to a local dataset mid-build because the endpoint was down globally. (Used Open Food Facts API)
 
 ---
+### Day 002 — Artist Quote Jar
+**Date:** Sept 5, 2026
+**Stack type:** CRUD, vanilla HTML/CSS/JS
+**Live:** [https://soft-gnome-c3f187.netlify.app]
 
+**Scope:** A quote generator pulling exclusively from real, verified artists across disciplines — painters, fashion designers, musicians, performance and digital artists. Visual centerpiece is a pixel-art mason jar with paper "quote shreds" inside. Drawing a new quote animates a torn-paper card out below the jar, set against a custom pixel-art library bookshelf background.
+
+**The bug:** The image for the jar was taken from a reference image of a pickle jar, and some of the old contents of the jar were still showing. Fixed by combining two masks, one that reliably catches every pixel (including dark shadow/seed specks) via flood-fill, and one that only matches genuine pickle color, so only real pickle pixels got replaced while the highlight stayed intact.
+
+**What I learned:** I wanted to use a public API at first, but learned that no public API can filter quotes down to just artists, so I had to hand-verify a local dataset instead. Also learned that pixel art comes from drawing at a tiny resolution and scaling up with nearest-neighbor, not from vector shapes with hard corners. Smooth vector edges never read as "pixelated" no matter how blocky the corners are. (No external API used — quotes hand-verified against real interviews/sources instead.)
+
+**Enjoyed it:** Yes
 
 
