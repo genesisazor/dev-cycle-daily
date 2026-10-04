@@ -3,118 +3,176 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fillup — daily calorie & protein tank</title>
+<meta name="theme-color" content="#0A0C0F">
+<title>Fillup — daily calorie & protein tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@500;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #F4E4C1;
-    --panel: #FFF8E7;
-    --wood: #5C3A21;
-    --wood-mid: #A9713F;
-    --leaf: #6FA85A;
-    --leaf-dark: #3F7A3D;
-    --berry: #D97052;
-    --berry-dark: #8E3324;
-    --sun: #E8A33D;
-    --ink: #3B2A1E;
-    --ink-soft: #7A5C3E;
+    --bg: #0A0C0F;
+    --panel: #12151A;
+    --panel-2: #181C22;
+    --line: #232830;
+    --line-soft: #1B2027;
+    --text: #F2F4F6;
+    --muted: #8A929D;
+    --faint: #5A626D;
+    --accent: #B6F23A;
+    --accent-dim: #7FA92A;
+    --accent-ink: #0A0C0F;
+    --accent-glow: rgba(182, 242, 58, 0.22);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  * { box-sizing: border-box; image-rendering: pixelated; }
+  * { box-sizing: border-box; }
 
   body {
     margin: 0;
     background: var(--bg);
-    background-image:
-      repeating-linear-gradient(0deg, rgba(92,58,33,0.05) 0, rgba(92,58,33,0.05) 2px, transparent 2px, transparent 4px),
-      repeating-linear-gradient(90deg, rgba(92,58,33,0.05) 0, rgba(92,58,33,0.05) 2px, transparent 2px, transparent 4px);
-    color: var(--ink);
-    font-family: 'Nunito', sans-serif;
-    font-size: 19px;
-    letter-spacing: 0.3px;
+    background-image: radial-gradient(900px 420px at 50% -120px, rgba(182,242,58,0.07), transparent 70%);
+    background-repeat: no-repeat;
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    padding: 28px 16px 60px;
+    padding: 32px 16px 64px;
   }
 
-  .app {
-    width: 100%;
-    max-width: 420px;
-  }
+  .app { width: 100%; max-width: 440px; }
 
-  .kicker {
-    font-family: 'Nunito', sans-serif;
-    font-size: 15px;
-    letter-spacing: 0.5px;
-    line-height: 1.6;
-    color: var(--ink-soft);
-    margin-bottom: 12px;
+  /* --- Header --- */
+  .brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
   }
-
+  .wordmark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--accent);
+    display: grid;
+    place-items: end center;
+    padding-bottom: 5px;
+    overflow: hidden;
+    position: relative;
+  }
+  .logo-mark::before {
+    content: '';
+    width: 12px;
+    height: 17px;
+    border-radius: 4px;
+    border: 2px solid var(--accent-ink);
+    background: linear-gradient(180deg, transparent 45%, var(--accent-ink) 45%);
+  }
   h1 {
-    font-family: 'DynaPuff', cursive;
+    margin: 0;
+    font-size: 22px;
     font-weight: 700;
-    font-size: 32px;
-    margin: 0 0 10px;
-    letter-spacing: 0.5px;
-    color: var(--wood);
-    text-shadow: 3px 3px 0 var(--sun);
+    letter-spacing: -0.03em;
   }
-
+  .date-chip {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-variant-numeric: tabular-nums;
+  }
   .sub {
-    font-size: 18px;
-    color: var(--ink-soft);
-    margin-bottom: 24px;
-    line-height: 1.4;
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 24px;
   }
 
-  /* --- Pixel panel base --- */
-  .tank-unit, .saved-box, .goals-box, .add-box, .selected-box, .result-item {
+  /* --- Panels --- */
+  .tank-unit, .saved-box, .goals-box, .add-box, .log {
     background: var(--panel);
-    border: 3px solid var(--wood);
-    border-radius: 0;
-    box-shadow: 4px 4px 0 0 var(--wood-mid);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  h2 {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 14px;
   }
 
   /* --- Tanks --- */
   .tanks {
     display: flex;
-    gap: 16px;
-    margin-bottom: 26px;
+    gap: 12px;
+    margin-bottom: 14px;
   }
 
   .tank-unit {
     flex: 1;
-    padding: 16px 14px 14px;
+    padding: 18px 14px 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    transition: border-color 0.5s var(--ease), box-shadow 0.5s var(--ease);
+  }
+  .tank-unit.full {
+    border-color: rgba(182, 242, 58, 0.55);
+    box-shadow: 0 0 0 1px rgba(182,242,58,0.12), 0 0 36px var(--accent-glow);
+  }
+  .tank-unit.pulse { animation: pulse 0.7s var(--ease); }
+  @keyframes pulse {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(1.03); box-shadow: 0 0 30px var(--accent-glow); }
+    100% { transform: scale(1); }
   }
 
   .tank-label {
-    font-family: 'Nunito', sans-serif;
-    font-size: 17px;
-    letter-spacing: 0.5px;
-    color: var(--wood);
-    margin-bottom: 10px;
-    text-align: center;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
   }
+
+  .tank-wrap { position: relative; }
 
   .tank {
     position: relative;
-    width: 64px;
+    width: 76px;
     height: 150px;
-    border: 3px solid var(--wood);
-    border-radius: 0;
+    border: 1px solid var(--line);
+    border-radius: 18px;
     overflow: hidden;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent, transparent 13px,
-      rgba(92,58,33,0.10) 13px, rgba(92,58,33,0.10) 15px
-    );
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0)) ,
+      #0D1014;
+  }
+  .tank::after {
+    /* tick marks at 25 / 50 / 75 % */
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, rgba(255,255,255,0.10) 0 8px, transparent 8px) 0 25% / 100% 1px no-repeat,
+      linear-gradient(90deg, rgba(255,255,255,0.10) 0 8px, transparent 8px) 0 50% / 100% 1px no-repeat,
+      linear-gradient(90deg, rgba(255,255,255,0.10) 0 8px, transparent 8px) 0 75% / 100% 1px no-repeat;
   }
 
   .liquid {
@@ -123,58 +181,83 @@
     right: 0;
     bottom: 0;
     height: 0%;
-    transition: height 0.6s steps(10);
+    background: linear-gradient(180deg, rgba(182,242,58,0.95) 0%, rgba(127,169,42,0.85) 100%);
+    transition: height 1s var(--ease);
   }
   .liquid.empty svg { display: none; }
-  .liquid.cal { background: var(--leaf-dark); }
-  .liquid.pro { background: var(--berry-dark); }
-
   .liquid svg {
     position: absolute;
-    top: -7px;
+    top: -10px;
     left: 0;
     width: 200%;
-    height: 8px;
-    animation: wave 1.6s steps(8) infinite;
+    height: 10px;
+    animation: wave 3.2s linear infinite;
   }
+  .liquid svg path { fill: rgba(182,242,58,0.95); }
   @keyframes wave {
     from { transform: translateX(0); }
-    to { transform: translateX(-40px); }
+    to { transform: translateX(-50%); }
   }
-  .liquid.cal svg path { fill: var(--leaf); }
-  .liquid.pro svg path { fill: var(--berry); }
+
+  .tank-unit.full .liquid { box-shadow: 0 0 24px var(--accent-glow); }
+
+  /* floating "+N" on every log */
+  .float {
+    position: absolute;
+    left: 50%;
+    bottom: 40%;
+    transform: translateX(-50%);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+    text-shadow: 0 0 12px var(--accent-glow);
+    pointer-events: none;
+    white-space: nowrap;
+    animation: floatUp 1.3s var(--ease) forwards;
+  }
+  @keyframes floatUp {
+    0%   { opacity: 0; transform: translate(-50%, 8px); }
+    20%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -46px); }
+  }
 
   .tank-readout {
-    margin-top: 12px;
+    margin-top: 16px;
     text-align: center;
   }
   .tank-readout .num {
-    font-family: 'Nunito', sans-serif;
-    font-size: 28px;
-    color: var(--wood);
-    line-height: 1;
-    letter-spacing: 0.5px;
+    font-size: 32px;
     font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
   }
   .tank-readout .of {
-    font-family: 'Nunito', sans-serif;
-    font-size: 16px;
-    letter-spacing: 0.3px;
-    color: var(--ink-soft);
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-variant-numeric: tabular-nums;
   }
   .tank-readout .pct {
-    font-family: 'Nunito', sans-serif;
-    font-size: 15px;
-    letter-spacing: 0.3px;
-    color: var(--ink-soft);
-    margin-top: 4px;
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.4s, border-color 0.4s, background 0.4s;
+  }
+  .tank-unit.full .pct {
+    color: var(--accent-ink);
+    background: var(--accent);
+    border-color: var(--accent);
   }
 
   /* --- Saved foods --- */
-  .saved-box {
-    margin-bottom: 18px;
-    overflow: visible;
-  }
+  .saved-box { margin-bottom: 14px; }
   .saved-header {
     width: 100%;
     background: none;
@@ -184,160 +267,216 @@
     justify-content: space-between;
     padding: 14px 16px;
     cursor: pointer;
-    font-family: 'Nunito', sans-serif;
-    font-size: 19px;
-    letter-spacing: 0.4px;
-    font-weight: 700;
-    color: var(--wood);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    border-radius: var(--radius);
   }
-  .saved-header-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .bookmark-icon { color: var(--sun); flex: none; }
+  .saved-header-left { display: flex; align-items: center; gap: 10px; }
+  .bookmark-icon { color: var(--accent); flex: none; }
   .saved-count {
-    font-family: 'Nunito', sans-serif;
-    font-size: 15px;
-    color: var(--wood);
-    background: var(--bg);
-    border: 2px solid var(--wood);
-    border-radius: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
     padding: 1px 8px;
+    font-variant-numeric: tabular-nums;
   }
   .chevron {
-    color: var(--wood);
+    color: var(--muted);
     font-size: 12px;
-    transition: transform 0.15s;
+    transition: transform 0.2s var(--ease);
   }
   .saved-box.open .chevron { transform: rotate(180deg); }
-  .saved-foods-list {
-    display: none;
-    padding: 0 16px 14px;
-  }
+  .saved-foods-list { display: none; padding: 0 16px 8px; }
   .saved-box.open .saved-foods-list { display: block; }
 
-  .goals-box {
-    padding: 16px;
-    margin-bottom: 22px;
-  }
-  .goals-box h2 {
-    font-family: 'Nunito', sans-serif;
-    font-size: 20px;
-    letter-spacing: 0.4px;
-    font-weight: 700;
-    color: var(--wood);
-    margin: 0 0 14px;
-  }
-  .field-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-  .field {
-    flex: 1;
-  }
+  .goals-box, .add-box, .log { padding: 18px 16px; margin-bottom: 14px; }
+
+  .field-row { display: flex; gap: 10px; margin-bottom: 12px; }
+  .field { flex: 1; }
   .field label {
     display: block;
-    font-size: 14px;
-    color: var(--ink-soft);
-    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 6px;
   }
+
   input[type="number"], input[type="text"] {
     width: 100%;
-    padding: 8px 10px;
-    border: 3px solid var(--wood);
-    border-radius: 0;
-    font-family: 'Nunito', sans-serif;
-    font-size: 18px;
-    background: #fff;
-    color: var(--ink);
-    box-shadow: inset 2px 2px 0 rgba(92,58,33,0.12);
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 16px;
+    background: #0D1014;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    transition: border-color 0.15s, box-shadow 0.15s;
   }
+  input::placeholder { color: var(--faint); }
   input:focus {
     outline: none;
-    border-color: var(--sun);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(182,242,58,0.14);
   }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type="number"] { -moz-appearance: textfield; }
   input[type="checkbox"] {
-    accent-color: var(--wood);
+    accent-color: var(--accent);
     width: 16px;
     height: 16px;
   }
 
   button {
-    font-family: 'Nunito', sans-serif;
-    font-weight: 700;
-    font-size: 18px;
-    letter-spacing: 0.2px;
-    border: 3px solid var(--wood);
-    border-radius: 0;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 15px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
     padding: 10px 14px;
     cursor: pointer;
-    background: var(--panel);
-    color: var(--wood);
+    background: var(--panel-2);
+    color: var(--text);
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
   }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
   .btn-primary {
-    background: var(--leaf-dark);
-    color: #fff;
-    border-color: var(--wood);
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: var(--accent);
     width: 100%;
-    font-size: 19px;
-    box-shadow: 4px 4px 0 0 var(--wood);
-    transition: transform 0.05s, box-shadow 0.05s;
+    padding: 12px 14px;
   }
-  .btn-primary:active {
-    transform: translate(4px, 4px);
-    box-shadow: 0 0 0 0 var(--wood);
+  .btn-primary:hover { background: #C5F75C; }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .btn-secondary {
+    background: var(--panel-2);
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-secondary:active { transform: scale(0.97); }
+
+  /* --- Tabs (segmented control) --- */
+  .tab-row {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: #0D1014;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+  .tab-btn {
+    flex: 1;
+    background: transparent;
+    color: var(--muted);
+    border: none;
+    font-size: 13px;
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active {
+    background: var(--panel-2);
+    color: var(--text);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .search-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .search-row input { flex: 1; }
+
+  .search-status {
+    font-size: 13px;
+    color: var(--muted);
+    padding: 4px 0;
   }
 
-  /* --- Add food --- */
-  .add-box {
-    padding: 16px;
-    margin-bottom: 22px;
+  .result-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    background: var(--panel-2);
+    font-weight: 400;
   }
-  .add-box h2 {
-    font-family: 'Nunito', sans-serif;
-    font-size: 20px;
-    letter-spacing: 0.4px;
-    font-weight: 700;
-    color: var(--wood);
-    margin: 0 0 14px;
+  .result-item:hover { border-color: var(--accent); }
+  .result-item:active { transform: scale(0.99); }
+  .result-name { font-size: 14px; font-weight: 600; margin-bottom: 3px; color: var(--text); }
+  .result-macros { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .selected-box {
+    padding: 14px;
+    margin-top: 6px;
+    background: var(--panel-2);
+    border: 1px solid rgba(182,242,58,0.45);
+    border-radius: var(--radius-sm);
   }
+  .selected-name { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+  .qty-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .qty-row input { width: 90px; flex: none; }
+  .qty-row span { font-size: 13px; color: var(--muted); }
+  .selected-preview {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .qty-field { flex: 0 0 82px; }
+  .selected-preview:empty { display: none; }
+
+  .source-note {
+    font-size: 12px;
+    color: var(--faint);
+    margin-top: 14px;
+    line-height: 1.55;
+  }
+
+  .remember-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 14px; }
+  .remember-row input { width: auto; margin-top: 2px; }
+  .remember-row label { font-size: 13px; color: var(--muted); line-height: 1.4; }
 
   /* --- Log --- */
-  .log {
-    background-color: var(--panel);
-    border: 3px solid var(--wood);
-    border-radius: 0;
-    box-shadow: 4px 4px 0 0 var(--wood-mid);
-    padding: 16px;
-    margin-bottom: 22px;
-  }
-  .log h2 {
-    font-family: 'Nunito', sans-serif;
-    font-size: 20px;
-    letter-spacing: 0.4px;
-    font-weight: 700;
-    color: var(--wood);
-    margin: 0 0 8px;
-  }
+  .log { padding-bottom: 8px; }
+  .log h2 { margin-bottom: 6px; }
   .log .empty {
-    font-size: 16px;
-    color: var(--ink-soft);
-    padding: 18px 0;
+    font-size: 14px;
+    color: var(--faint);
+    padding: 22px 0;
     text-align: center;
   }
   .entry {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 2px;
-    border-bottom: 3px dashed var(--wood-mid);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line-soft);
     gap: 10px;
   }
   .entry:last-child { border-bottom: none; }
+  .entry-qty {
+    margin-left: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+  }
   .entry-name {
-    font-size: 17px;
+    font-size: 14px;
+    font-weight: 500;
     flex: 1;
     min-width: 0;
     overflow: hidden;
@@ -345,188 +484,53 @@
     white-space: nowrap;
   }
   .entry-macros {
-    font-family: 'Nunito', sans-serif;
-    font-size: 16px;
-    color: var(--ink-soft);
+    font-size: 13px;
+    color: var(--muted);
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
   }
-  .entry-bookmark {
+  .entry-bookmark, .entry-del, .saved-food-del {
     background: none;
     border: none;
-    color: var(--ink-soft);
-    padding: 2px 4px;
+    color: var(--faint);
+    padding: 4px 6px;
     line-height: 1;
     flex: none;
+    border-radius: 6px;
   }
-  .entry-bookmark.saved { color: var(--sun); }
-  .entry-del {
-    background: none;
-    border: none;
-    color: var(--berry-dark);
-    font-size: 20px;
-    padding: 2px 6px;
-    line-height: 1;
-  }
+  .entry-bookmark:hover { color: var(--text); }
+  .entry-bookmark.saved { color: var(--accent); }
+  .entry-del, .saved-food-del { font-size: 20px; font-weight: 400; }
+  .entry-del:hover, .saved-food-del:hover { color: var(--text); }
 
-  .remember-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    margin-bottom: 14px;
-  }
-  .remember-row input {
-    width: auto;
-    margin-top: 3px;
-  }
-  .remember-row label {
-    font-size: 14px;
-    color: var(--ink-soft);
-    line-height: 1.4;
-  }
-
-  .tab-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-  .tab-btn {
-    flex: 1;
-    background: var(--bg);
-    color: var(--wood);
-    border: 3px solid var(--wood);
-    font-size: 13px;
-    padding: 8px 10px;
-  }
-  .tab-btn.active {
-    background: var(--wood);
-    color: #fff;
-  }
-  .panel { display: none; }
-  .panel.active { display: block; }
-
-  .search-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-  .search-row input { flex: 1; }
-  .btn-secondary {
-    background: var(--sun);
-    color: var(--wood);
-    border-color: var(--wood);
-    white-space: nowrap;
-    box-shadow: 3px 3px 0 0 var(--wood);
-    transition: transform 0.05s, box-shadow 0.05s;
-  }
-  .btn-secondary:active {
-    transform: translate(3px, 3px);
-    box-shadow: 0 0 0 0 var(--wood);
-  }
-
-  .search-status {
-    font-size: 15px;
-    color: var(--ink-soft);
-    padding: 6px 0;
-  }
-
-  .result-item {
-    width: 100%;
-    text-align: left;
-    padding: 10px 12px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    font-family: 'Nunito', sans-serif;
-    box-shadow: 3px 3px 0 0 var(--wood-mid);
-    transition: transform 0.05s, box-shadow 0.05s;
-  }
-  .result-item:active {
-    transform: translate(3px, 3px);
-    box-shadow: 0 0 0 0 var(--wood-mid);
-  }
-  .result-name {
-    font-size: 17px;
-    margin-bottom: 3px;
-    color: var(--ink);
-  }
-  .result-macros {
-    font-family: 'Nunito', sans-serif;
-    font-size: 14px;
-    color: var(--ink-soft);
-  }
-
-  .selected-box {
-    padding: 12px;
-    margin-top: 6px;
-    border-color: var(--sun);
-  }
-  .selected-name {
-    font-size: 17px;
-    font-weight: 400;
-    margin-bottom: 8px;
-    color: var(--wood);
-  }
-  .qty-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-  .qty-row input { width: 90px; flex: none; }
-  .qty-row span { font-size: 14px; color: var(--ink-soft); }
-  .selected-preview {
-    font-family: 'Nunito', sans-serif;
-    font-size: 16px;
-    color: var(--ink-soft);
-    margin-bottom: 10px;
-  }
-
-  .source-note {
-    font-size: 13px;
-    color: var(--ink-soft);
-    margin-top: 12px;
-    line-height: 1.5;
-  }
-
-  .saved-foods-empty {
-    font-size: 14px;
-    color: var(--ink-soft);
-    padding: 6px 0;
-  }
+  .saved-foods-empty { font-size: 13px; color: var(--faint); padding: 4px 0 10px; }
   .saved-food-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    padding: 8px 0;
-    border-bottom: 3px dashed var(--wood-mid);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line-soft);
   }
   .saved-food-row:last-child { border-bottom: none; }
   .saved-food-name {
-    font-size: 16px;
+    font-size: 14px;
+    font-weight: 500;
     flex: 1;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: var(--ink);
   }
   .saved-food-macros {
-    font-family: 'Nunito', sans-serif;
-    font-size: 14px;
-    color: var(--ink-soft);
+    font-size: 13px;
+    color: var(--muted);
     white-space: nowrap;
-  }
-  .saved-food-del {
-    background: none;
-    border: none;
-    color: var(--berry-dark);
-    font-size: 18px;
-    padding: 2px 6px;
-    line-height: 1;
+    font-variant-numeric: tabular-nums;
   }
 
   .footer-row {
-    margin-top: 24px;
+    margin-top: 22px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -534,31 +538,44 @@
   .reset-link {
     background: none;
     border: none;
-    color: var(--ink-soft);
-    font-size: 15px;
+    color: var(--faint);
+    font-size: 13px;
+    font-weight: 500;
     padding: 0;
     text-decoration: underline;
+    text-underline-offset: 3px;
   }
-  .day-tag {
-    font-family: 'Nunito', sans-serif;
-    font-size: 15px;
-    color: var(--ink-soft);
+  .reset-link:hover { color: var(--text); }
+  .day-tag { font-size: 13px; color: var(--faint); font-variant-numeric: tabular-nums; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .liquid, .tank-unit { transition: none; }
+    .liquid svg { animation: none; }
+    .tank-unit.pulse { animation: none; }
+    .float { animation-duration: 0.01s; }
   }
 </style>
 
 </head>
 <body>
 <div class="app">
-  <div class="kicker">dev-cycle-daily &middot; day 01 &middot; vanilla html/css/js</div>
-  <h1>Fillup</h1>
-  <div class="sub">Set a goal. Log what you eat. Watch the tank rise.</div>
+  <div class="brand">
+    <div class="wordmark">
+      <div class="logo-mark" aria-hidden="true"></div>
+      <h1>Fillup</h1>
+    </div>
+    <span class="date-chip" id="dateChip"></span>
+  </div>
+  <p class="sub">Set a goal. Log what you eat. Watch the tank rise.</p>
 
   <div class="tanks">
-    <div class="tank-unit">
+    <div class="tank-unit" id="calUnit">
       <div class="tank-label">Calories</div>
-      <div class="tank">
-        <div class="liquid cal empty" id="calLiquid">
-          <svg viewBox="0 0 40 8" preserveAspectRatio="none"><path d="M0,8 L0,4 L5,4 L5,0 L10,0 L10,4 L15,4 L15,0 L20,0 L20,4 L25,4 L25,0 L30,0 L30,4 L35,4 L35,0 L40,0 L40,8 Z"/></svg>
+      <div class="tank-wrap" id="calWrap">
+        <div class="tank">
+          <div class="liquid cal empty" id="calLiquid">
+            <svg viewBox="0 0 40 8" preserveAspectRatio="none"><path d="M0,4 Q5,0 10,4 T20,4 T30,4 T40,4 L40,8 L0,8 Z"/></svg>
+          </div>
         </div>
       </div>
       <div class="tank-readout">
@@ -568,11 +585,13 @@
       </div>
     </div>
 
-    <div class="tank-unit">
+    <div class="tank-unit" id="proUnit">
       <div class="tank-label">Protein</div>
-      <div class="tank">
-        <div class="liquid pro empty" id="proLiquid">
-          <svg viewBox="0 0 40 8" preserveAspectRatio="none"><path d="M0,8 L0,4 L5,4 L5,0 L10,0 L10,4 L15,4 L15,0 L20,0 L20,4 L25,4 L25,0 L30,0 L30,4 L35,4 L35,0 L40,0 L40,8 Z"/></svg>
+      <div class="tank-wrap" id="proWrap">
+        <div class="tank">
+          <div class="liquid pro empty" id="proLiquid">
+            <svg viewBox="0 0 40 8" preserveAspectRatio="none"><path d="M0,4 Q5,0 10,4 T20,4 T30,4 T40,4 L40,8 L0,8 Z"/></svg>
+          </div>
         </div>
       </div>
       <div class="tank-readout">
@@ -622,7 +641,7 @@
         <input type="text" id="searchInput" placeholder="e.g. chicken, rice, banana">
         <button class="btn-secondary" id="searchBtn">Search</button>
       </div>
-      <div id="searchStatus"></div>
+      <div class="search-status" id="searchStatus"></div>
       <div id="searchResults"></div>
       <div id="selectedFoodBox"></div>
       <div class="source-note">Built-in list: common staples (by weight) plus sized drinks and popular NYC chain items. Chain values are approximate, published estimates &mdash; check the official source if precision matters. Anything you bookmark shows up here too, tagged "saved by you."</div>
@@ -637,14 +656,19 @@
       </div>
       <div class="field-row">
         <div class="field">
-          <label for="foodCal">Calories</label>
+          <label for="foodCal">Calories (each)</label>
           <input type="number" id="foodCal" placeholder="280" min="0">
         </div>
         <div class="field">
-          <label for="foodPro">Protein (g)</label>
+          <label for="foodPro">Protein (each)</label>
           <input type="number" id="foodPro" placeholder="35" min="0">
         </div>
+        <div class="field qty-field">
+          <label for="foodQty">Quantity</label>
+          <input type="number" id="foodQty" value="1" min="0" step="0.5">
+        </div>
       </div>
+      <div class="selected-preview" id="manualPreview"></div>
       <div class="remember-row">
         <input type="checkbox" id="rememberFood" checked>
         <label for="rememberFood">Remember this food, so I can find it by searching next time</label>
@@ -666,6 +690,7 @@
 
 <script>
   const STORAGE_KEY = 'fillup_state_v1';
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function todayStr() {
     const d = new Date();
@@ -689,8 +714,74 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }
 
-  function render() {
+  // --- Animation helpers ---
+  // Counts a number up (or down) to its new value so every log feels like a hit.
+  function setNum(el, to, suffix) {
+    suffix = suffix || '';
+    const from = (typeof el._val === 'number') ? el._val : 0;
+    el._val = to;
+    if (el._raf) cancelAnimationFrame(el._raf);
+    if (reduceMotion || from === to) { el.textContent = to + suffix; return; }
+    const start = performance.now();
+    const dur = 900;
+    function frame(now) {
+      const t = Math.min(1, (now - start) / dur);
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(from + (to - from) * eased) + suffix;
+      if (t < 1) el._raf = requestAnimationFrame(frame);
+    }
+    el._raf = requestAnimationFrame(frame);
+  }
+
+  function pulseUnit(unitEl) {
+    unitEl.classList.remove('pulse');
+    void unitEl.offsetWidth;
+    unitEl.classList.add('pulse');
+  }
+
+  function floatLabel(wrapEl, text) {
+    const f = document.createElement('div');
+    f.className = 'float';
+    f.textContent = text;
+    wrapEl.appendChild(f);
+    setTimeout(() => f.remove(), 1400);
+  }
+
+  function updateTank(cfg, total, goal, opts) {
+    const numEl = document.getElementById(cfg.num);
+    const ofEl = document.getElementById(cfg.of);
+    const pctEl = document.getElementById(cfg.pct);
+    const liquidEl = document.getElementById(cfg.liquid);
+    const unitEl = document.getElementById(cfg.unit);
+
+    setNum(numEl, total, cfg.suffix);
+    void liquidEl.offsetHeight; // make sure the height transition always runs
+
+    if (goal) {
+      ofEl.textContent = 'of ' + goal + cfg.suffix;
+      const pct = Math.min(100, Math.round((total / goal) * 100));
+      pctEl.textContent = pct >= 100 ? 'Goal reached' : pct + '%';
+      liquidEl.style.height = pct + '%';
+      liquidEl.classList.toggle('empty', pct === 0);
+      unitEl.classList.toggle('full', pct >= 100);
+    } else {
+      ofEl.textContent = 'of 0' + cfg.suffix;
+      pctEl.textContent = 'set a goal below';
+      liquidEl.style.height = '0%';
+      liquidEl.classList.add('empty');
+      unitEl.classList.remove('full');
+    }
+
+    if (opts && opts.added && opts.added > 0) {
+      pulseUnit(unitEl);
+      floatLabel(document.getElementById(cfg.wrap), '+' + opts.added + cfg.suffix);
+    }
+  }
+
+  function render(opts) {
+    opts = opts || {};
     document.getElementById('dayTag').textContent = state.date;
+    document.getElementById('dateChip').textContent = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 
     // Goal inputs reflect saved goals
     document.getElementById('calGoalInput').value = state.calGoal ?? '';
@@ -699,37 +790,14 @@
     const calTotal = state.entries.reduce((s,e) => s + e.cal, 0);
     const proTotal = state.entries.reduce((s,e) => s + e.pro, 0);
 
-    // Calories tank
-    document.getElementById('calNum').textContent = calTotal;
-    const calLiquidEl = document.getElementById('calLiquid');
-    if (state.calGoal) {
-      document.getElementById('calOf').textContent = 'of ' + state.calGoal;
-      const pct = Math.min(100, Math.round((calTotal/state.calGoal)*100));
-      document.getElementById('calPct').textContent = pct + '%';
-      calLiquidEl.style.height = pct + '%';
-      calLiquidEl.classList.toggle('empty', pct === 0);
-    } else {
-      document.getElementById('calOf').textContent = 'of 0';
-      document.getElementById('calPct').textContent = 'set a goal below';
-      calLiquidEl.style.height = '0%';
-      calLiquidEl.classList.add('empty');
-    }
-
-    // Protein tank
-    document.getElementById('proNum').textContent = proTotal + 'g';
-    const proLiquidEl = document.getElementById('proLiquid');
-    if (state.proGoal) {
-      document.getElementById('proOf').textContent = 'of ' + state.proGoal + 'g';
-      const pct = Math.min(100, Math.round((proTotal/state.proGoal)*100));
-      document.getElementById('proPct').textContent = pct + '%';
-      proLiquidEl.style.height = pct + '%';
-      proLiquidEl.classList.toggle('empty', pct === 0);
-    } else {
-      document.getElementById('proOf').textContent = 'of 0g';
-      document.getElementById('proPct').textContent = 'set a goal below';
-      proLiquidEl.style.height = '0%';
-      proLiquidEl.classList.add('empty');
-    }
+    updateTank(
+      { num: 'calNum', of: 'calOf', pct: 'calPct', liquid: 'calLiquid', unit: 'calUnit', wrap: 'calWrap', suffix: '' },
+      calTotal, state.calGoal, { added: opts.addedCal }
+    );
+    updateTank(
+      { num: 'proNum', of: 'proOf', pct: 'proPct', liquid: 'proLiquid', unit: 'proUnit', wrap: 'proWrap', suffix: 'g' },
+      proTotal, state.proGoal, { added: opts.addedPro }
+    );
 
     // Log list
     const list = document.getElementById('logList');
@@ -742,9 +810,9 @@
         row.className = 'entry';
         const isSaved = loadCustomFoods().some(f => f.name.toLowerCase() === entry.name.toLowerCase());
         row.innerHTML = `
-          <div class="entry-name">${escapeHtml(entry.name)}</div>
+          <div class="entry-name">${escapeHtml(entry.name)}${entry.qty ? `<span class="entry-qty">${escapeHtml(entry.qty)}</span>` : ''}</div>
           <div class="entry-macros">${entry.cal} cal &middot; ${entry.pro}g</div>
-          <button class="entry-bookmark ${isSaved ? 'saved' : ''}" data-name="${escapeHtml(entry.name)}" data-cal="${entry.cal}" data-pro="${entry.pro}" title="${isSaved ? 'Saved to My saved foods' : 'Save to My saved foods'}">
+          <button class="entry-bookmark ${isSaved ? 'saved' : ''}" data-name="${escapeHtml(entry.name)}" data-cal="${entry.unitCal ?? entry.cal}" data-pro="${entry.unitPro ?? entry.pro}" title="${isSaved ? 'Saved to My saved foods' : 'Save to My saved foods'}">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="${isSaved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
           </button>
           <button class="entry-del" data-id="${entry.id}">&times;</button>
@@ -769,15 +837,22 @@
     render();
   });
 
-  function addEntry(name, cal, pro) {
+  // qtyLabel (e.g. "\u00d72" or "250g") is shown in the log; unitCal/unitPro are the
+  // per-serving values used when an entry is bookmarked.
+  function addEntry(name, cal, pro, qtyLabel, unitCal, unitPro) {
+    const c = isNaN(cal) ? 0 : Math.round(cal);
+    const p = isNaN(pro) ? 0 : Math.round(pro);
     state.entries.push({
       id: Date.now(),
       name: name,
-      cal: isNaN(cal) ? 0 : Math.round(cal),
-      pro: isNaN(pro) ? 0 : Math.round(pro)
+      cal: c,
+      pro: p,
+      qty: qtyLabel || '',
+      unitCal: (unitCal === undefined ? c : unitCal),
+      unitPro: (unitPro === undefined ? p : unitPro)
     });
     saveState();
-    render();
+    render({ addedCal: c, addedPro: p });
   }
 
   // --- Tab switching ---
@@ -806,21 +881,27 @@
     const nameInput = document.getElementById('foodName');
     const calInput = document.getElementById('foodCal');
     const proInput = document.getElementById('foodPro');
+    const qtyInput = document.getElementById('foodQty');
     const rememberBox = document.getElementById('rememberFood');
 
     const name = nameInput.value.trim() || 'Untitled item';
     const cal = parseFloat(calInput.value);
     const pro = parseFloat(proInput.value);
+    const qty = isNaN(parseFloat(qtyInput.value)) ? 1 : parseFloat(qtyInput.value);
 
     if (isNaN(cal) && isNaN(pro)) {
       calInput.focus();
+      return;
+    }
+    if (qty <= 0) {
+      qtyInput.focus();
       return;
     }
 
     const finalCal = isNaN(cal) ? 0 : cal;
     const finalPro = isNaN(pro) ? 0 : pro;
 
-    addEntry(name, finalCal, finalPro);
+    addEntry(name, finalCal * qty, finalPro * qty, qty !== 1 ? '\u00d7' + qty : '', finalCal, finalPro);
 
     if (rememberBox.checked && nameInput.value.trim()) {
       saveCustomFood(name, finalCal, finalPro);
@@ -829,10 +910,28 @@
     nameInput.value = '';
     calInput.value = '';
     proInput.value = '';
+    qtyInput.value = 1;
+    updateManualPreview();
     nameInput.focus();
   });
 
-  // --- Food search (Open Food Facts) ---
+  // Live total for the manual form when quantity is more than one
+  function updateManualPreview() {
+    const cal = parseFloat(document.getElementById('foodCal').value);
+    const pro = parseFloat(document.getElementById('foodPro').value);
+    const qty = parseFloat(document.getElementById('foodQty').value);
+    const el = document.getElementById('manualPreview');
+    if ((isNaN(cal) && isNaN(pro)) || isNaN(qty) || qty <= 0 || qty === 1) {
+      el.textContent = '';
+      return;
+    }
+    el.textContent = 'Total \u2248 ' + Math.round((cal || 0) * qty) + ' cal \u00b7 ' + Math.round((pro || 0) * qty) + 'g protein';
+  }
+  ['foodCal', 'foodPro', 'foodQty'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateManualPreview);
+  });
+
+  // --- Food search ---
   const searchInput = document.getElementById('searchInput');
   const searchBtn = document.getElementById('searchBtn');
   const searchStatus = document.getElementById('searchStatus');
@@ -1081,7 +1180,12 @@
 
     document.getElementById('addSelectedBtn').addEventListener('click', () => {
       const t = computeTotals();
-      addEntry(selectedFood.name, t.cal, t.pro);
+      const qty = parseFloat(qtyInput.value) || 0;
+      if (isWeight) {
+        addEntry(selectedFood.name, t.cal, t.pro, qty + 'g');
+      } else {
+        addEntry(selectedFood.name, t.cal, t.pro, qty !== 1 ? '\u00d7' + qty : '', selectedFood.kcal, selectedFood.pro);
+      }
       selectedFood = null;
       selectedFoodBox.innerHTML = '';
       searchInput.value = '';
